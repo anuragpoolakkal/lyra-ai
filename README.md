@@ -1,2 +1,3 @@
 # Lyra
-Voice Assistant App powered by ChatGPT and DALL-E
+
+Lyra is a AI Voice Assistant App powered by ChatGPT and DALL-E
