@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lyra/home_page.dart';
-import 'package:lyra/pallette.dart';
+import 'package:lyra/constants.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,6 +16,9 @@ class MyApp extends StatelessWidget {
       title: 'Lyra',
       theme: ThemeData.light(useMaterial3: true).copyWith(
         scaffoldBackgroundColor: Pallete.whiteColor,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Pallete.whiteColor,
+        ),
       ),
       home: const HomePage(),
     );

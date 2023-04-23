@@ -11,3 +11,5 @@ class Pallete {
   static const Color blackColor = Colors.black;
   static const Color whiteColor = Colors.white;
 }
+
+const fontFamily = 'Cera Pro';
