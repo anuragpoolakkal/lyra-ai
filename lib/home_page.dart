@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                       shape: BoxShape.circle,
                       image: DecorationImage(
                         image: AssetImage(
-                          'assets/images/virtualAssistant.png',
+                          'assets/images/lyra_logo.png',
                         ),
                       ),
                     ),
