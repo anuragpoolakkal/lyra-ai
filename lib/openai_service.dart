@@ -63,8 +63,8 @@ class OpenAIService {
           'Authorization': 'Bearer $openAIAPIKey',
         },
         body: jsonEncode({
-          "model": "gpt-3.5-turbo",
-          "messages": messages,
+          'model': "gpt-3.5-turbo",
+          'messages' : messages,
         }),
       );
 
@@ -86,6 +86,39 @@ class OpenAIService {
   }
 
   Future<String> dallEAPI(String prompt) async {
-    return 'DALL-E';
+     messages.add({
+      'role': 'user',
+      'content': prompt,
+    });
+
+    try {
+      final res = await http.post(
+        Uri.parse('https://api.openai.com/v1/images/generations'),
+        headers: {
+          'Content-type': 'application/json',
+          'Authorization': 'Bearer $openAIAPIKey',
+        },
+        body: jsonEncode({
+          'prompt': prompt,
+          'n': 1,
+        }),
+      );
+
+      if (res.statusCode == 200) {
+        String imageURL =
+            jsonDecode(res.body)['data'][0]['url'];
+        imageURL = imageURL.trim();
+
+        messages.add({
+          'role': 'assistant',
+          'content': imageURL,
+        });
+        return imageURL;
+      }
+      return 'An internal error occurred';
+    } catch (e) {
+      return e.toString();
+    }
+  }
   }
 }
