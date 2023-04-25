@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:lyra/constants.dart';
 import 'package:lyra/feature_box.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -14,13 +15,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final speechToText = SpeechToText();
+  final FlutterTts flutterTts = FlutterTts();
   String lastWords = '';
   final OpenAIService openAIService = OpenAIService();
+  String? generatedContent;
+  String? generatedImageURL;
 
   @override
   void initState() {
     super.initState();
     initSpeechToText();
+    initTextToSpeech();
+  }
+
+  Future<void> initTextToSpeech() async {
+    await flutterTts.setSharedInstance(true);
+    setState(() {});
   }
 
   Future<void> initSpeechToText() async {
@@ -44,10 +54,15 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> systemSpeak(String content) async {
+    await flutterTts.speak(content);
+  }
+
   @override
   void dispose() {
     super.dispose();
     speechToText.stop();
+    flutterTts.stop();
   }
 
   @override
@@ -104,59 +119,67 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(20).copyWith(
                     topLeft: Radius.zero,
                   )),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
                   vertical: 10.0,
                 ),
                 child: Text(
-                  'Good morning, what task can I do for you?',
-                  style: TextStyle(
+                  generatedContent == null
+                      ? 'Good morning, what task can I do for you?'
+                      : generatedContent!,
+                  style: const TextStyle(
                     fontFamily: fontFamily,
                     color: Pallete.mainFontColor,
-                    fontSize: 25,
+                    fontSize: generatedContent == null ? 25 : 18,
                   ),
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              alignment: Alignment.centerLeft,
-              margin: const EdgeInsets.only(
-                top: 10,
-                left: 22,
-              ),
-              child: const Text(
-                'Here are a few features',
-                style: TextStyle(
-                  fontFamily: fontFamily,
-                  color: Pallete.mainFontColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+            Visibility(
+              visible: generatedContent == null,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                alignment: Alignment.centerLeft,
+                margin: const EdgeInsets.only(
+                  top: 10,
+                  left: 22,
+                ),
+                child: const Text(
+                  'Here are a few features',
+                  style: TextStyle(
+                    fontFamily: fontFamily,
+                    color: Pallete.mainFontColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
             // features list
-            Column(
-              children: const [
-                FeatureBox(
-                  color: Pallete.firstSuggestionBoxColor,
-                  headerText: 'ChatGPT',
-                  descriptionText:
-                      'A smarter way to stay organized and informed with ChatGPT',
-                ),
-                FeatureBox(
-                  color: Pallete.secondSuggestionBoxColor,
-                  headerText: 'Dall-E',
-                  descriptionText:
-                      'Get inspired and stay creative with your personal assistant powered by DALL-E',
-                ),
-                FeatureBox(
-                  color: Pallete.thirdSuggestionBoxColor,
-                  headerText: 'Smart Voice Assistant',
-                  descriptionText:
-                      'Get the best of both worlds with a voice assistant powered by DALL-E and ChatGPT',
-                ),
-              ],
+            Visibility(
+              visible: generatedContent == null,
+              child: Column(
+                children: const [
+                  FeatureBox(
+                    color: Pallete.firstSuggestionBoxColor,
+                    headerText: 'ChatGPT',
+                    descriptionText:
+                        'A smarter way to stay organized and informed with ChatGPT',
+                  ),
+                  FeatureBox(
+                    color: Pallete.secondSuggestionBoxColor,
+                    headerText: 'Dall-E',
+                    descriptionText:
+                        'Get inspired and stay creative with your personal assistant powered by DALL-E',
+                  ),
+                  FeatureBox(
+                    color: Pallete.thirdSuggestionBoxColor,
+                    headerText: 'Smart Voice Assistant',
+                    descriptionText:
+                        'Get the best of both worlds with a voice assistant powered by DALL-E and ChatGPT',
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -168,7 +191,17 @@ class _HomePageState extends State<HomePage> {
             await startListening();
           } else if (speechToText.isListening) {
             final speech = await openAIService.isArtPrompAPI(lastWords);
-            print(speech);
+            if (speech.contains('https')) {
+              generatedImageURL = speech;
+              generatedContent = null;
+              setState(() {});
+            } else {
+              generatedContent = speech;
+              generatedImageURL = null;
+              setState(() {});
+              await systemSpeak(speech);
+            }
+
             await stopListening();
           } else {
             initSpeechToText();

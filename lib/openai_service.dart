@@ -64,7 +64,7 @@ class OpenAIService {
         },
         body: jsonEncode({
           'model': "gpt-3.5-turbo",
-          'messages' : messages,
+          'messages': messages,
         }),
       );
 
@@ -86,7 +86,7 @@ class OpenAIService {
   }
 
   Future<String> dallEAPI(String prompt) async {
-     messages.add({
+    messages.add({
       'role': 'user',
       'content': prompt,
     });
@@ -105,8 +105,7 @@ class OpenAIService {
       );
 
       if (res.statusCode == 200) {
-        String imageURL =
-            jsonDecode(res.body)['data'][0]['url'];
+        String imageURL = jsonDecode(res.body)['data'][0]['url'];
         imageURL = imageURL.trim();
 
         messages.add({
@@ -119,6 +118,5 @@ class OpenAIService {
     } catch (e) {
       return e.toString();
     }
-  }
   }
 }
