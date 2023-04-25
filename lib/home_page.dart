@@ -104,39 +104,50 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             // chat bubble
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              margin: const EdgeInsets.symmetric(horizontal: 40).copyWith(
-                top: 30,
-              ),
-              decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Pallete.borderColor,
-                  ),
-                  borderRadius: BorderRadius.circular(20).copyWith(
-                    topLeft: Radius.zero,
-                  )),
-              child: Padding(
+            Visibility(
+              visible: generatedImageURL == null,
+              child: Container(
                 padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
+                  horizontal: 20,
+                  vertical: 10,
                 ),
-                child: Text(
-                  generatedContent == null
-                      ? 'Good morning, what task can I do for you?'
-                      : generatedContent!,
-                  style: const TextStyle(
-                    fontFamily: fontFamily,
-                    color: Pallete.mainFontColor,
-                    fontSize: generatedContent == null ? 25 : 18,
+                margin: const EdgeInsets.symmetric(horizontal: 40).copyWith(
+                  top: 30,
+                ),
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Pallete.borderColor,
+                    ),
+                    borderRadius: BorderRadius.circular(20).copyWith(
+                      topLeft: Radius.zero,
+                    )),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                  ),
+                  child: Text(
+                    generatedContent == null
+                        ? 'Good morning, what task can I do for you?'
+                        : generatedContent!,
+                    style: TextStyle(
+                      fontFamily: fontFamily,
+                      color: Pallete.mainFontColor,
+                      fontSize: generatedContent == null ? 25 : 18,
+                    ),
                   ),
                 ),
               ),
             ),
+            if (generatedImageURL != null)
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.network(generatedImageURL!),
+                ),
+              ),
             Visibility(
-              visible: generatedContent == null,
+              visible: generatedContent == null && generatedImageURL == null,
               child: Container(
                 padding: const EdgeInsets.all(10),
                 alignment: Alignment.centerLeft,
@@ -157,7 +168,7 @@ class _HomePageState extends State<HomePage> {
             ),
             // features list
             Visibility(
-              visible: generatedContent == null,
+              visible: generatedContent == null && generatedImageURL == null,
               child: Column(
                 children: const [
                   FeatureBox(
@@ -207,8 +218,8 @@ class _HomePageState extends State<HomePage> {
             initSpeechToText();
           }
         },
-        child: const Icon(
-          Icons.mic,
+        child: Icon(
+          speechToText.isListening ? Icons.stop : Icons.mic,
         ),
       ),
     );
