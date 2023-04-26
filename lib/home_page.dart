@@ -226,7 +226,7 @@ class _HomePageState extends State<HomePage> {
                 speechToText.isNotListening) {
               await startListening();
             } else if (speechToText.isListening) {
-              final speech = await openAIService.isArtPrompAPI(lastWords);
+              final speech = await openAIService.isArtPromptAPI(lastWords);
               if (speech.contains('https')) {
                 generatedImageURL = speech;
                 generatedContent = null;
